@@ -1,9 +1,9 @@
-b5ad44b9cdab13949f80026fc6543fa8 *DESCRIPTION
+a08c432803057a83834f69a830f4f97c *DESCRIPTION
 236a0ade16e13d180c451ef3adf24e7b *NAMESPACE
-d671a915d8bbed9a01f5c9b91e6bf024 *R/ApplyFwer.R
-c632ec99ba317b3b76b35a759dcfb4e5 *R/FdrMethods.R
-ebd377cd35d01aeb8223ca5cfac78626 *R/FwerMethods.R
-e61f1531a857827fee774dd964fc7347 *R/FwerMethodsSD.R
+12a52c058a1325d1df59c86618bb1cbe *R/ApplyFwer.R
+30845cbbeb0b22ccb9f3c0353feab752 *R/FdrMethods.R
+333c2aaa73713ea5cfab35f642c3b075 *R/FwerMethods.R
+55202682ae9b1d20a1c98c0e80784975 *R/FwerMethodsSD.R
 91b9447f1b7026fb80a0db6ace3e492c *R/RcppExports.R
 3ed9247e3851aec12d5eae5f83ff7b84 *R/SimuFwer.R
 ab31b2770e438b3d5182c87350e989ad *R/eval_stat.R
@@ -23,7 +23,7 @@ fd7317f7a2129af9f35ce6bfddac14a0 *man/SidakCor.Rd
 ae8475321ad03e14e8baaf0205754d27 *man/SimuFdr.Rd
 1f070a4e89503b9ea2a0e12a5bb6cbf4 *man/SimuFwer.Rd
 5307f4a57b73f43718acba8632d9d761 *man/SimuFwer_oracle.Rd
-29173400cccb3ed99e2ca89402f513b7 *man/TestCor-package.Rd
+9dc741b247c6b9adb8d93e167224291f *man/TestCor-package.Rd
 ea65e8597c67e5cd578a756e2a0a9a36 *man/covDcor.Rd
 869ea0f31f4855cf474a99db19640ba5 *man/covDcorNorm.Rd
 f77675db7c0f42e8aa2cfa49da663522 *man/eval_stat.Rd

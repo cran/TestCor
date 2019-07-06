@@ -44,10 +44,10 @@ BonferroniCor <- function(data,alpha=0.05,stat_test='empirical',vect=FALSE){
   if(vect==TRUE){
     return(result)
   }else{
-    n <- nrow(data)
-    rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-    columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
-    return(cbind(rows[which(result)],columns[which(result)]))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
+   return(cbind(rows[which(result)],columns[which(result)]))
   }
 }
 
@@ -98,10 +98,10 @@ SidakCor <- function(data,alpha=0.05,stat_test='empirical',vect=FALSE){
   if(vect==TRUE){
     return(result)
   }else{
-    n <- nrow(data)
-    rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-    columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
-    return(cbind(rows[which(result)],columns[which(result)]))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
+   return(cbind(rows[which(result)],columns[which(result)]))
   }
 }
 
@@ -170,10 +170,10 @@ BootRWCor <- function(data,alpha=0.05,stat_test='empirical',Nboot=1000,vect=FALS
   if(vect==TRUE){
     return(result)
   }else{
-    n <- nrow(data)
-    rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-    columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
-    return(cbind(rows[which(result)],columns[which(result)]))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
+   return(cbind(rows[which(result)],columns[which(result)]))
   }
 
 }
@@ -237,10 +237,10 @@ maxTinftyCor <- function(data,alpha=0.05,stat_test='empirical',Nboot=1000,OmegaC
    if(vect==TRUE){
      return(result)
    }else{
-     n <- nrow(data)
-     rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-     columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
-     return(cbind(rows[which(result)],columns[which(result)]))
+    p <- ncol(data)
+    rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+    columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
+    return(cbind(rows[which(result)],columns[which(result)]))
    }
 
 }

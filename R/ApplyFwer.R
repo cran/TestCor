@@ -70,9 +70,9 @@ ApplyFwerCor <- function(data,alpha=0.05,stat_test='empirical',method='MaxTinfty
  if(vect==TRUE){
    return(res)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(res)],columns[which(res)]))
  }
 
@@ -136,9 +136,9 @@ ApplyFwerCor_oracle <- function(data,corr_theo,alpha=0.05,stat_test='empirical',
  if(vect==TRUE){
    return(res)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(res)],columns[which(res)]))
  }
 
@@ -204,9 +204,9 @@ if(method=='BHboot'){
  if(vect==TRUE){
    return(res)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(res)],columns[which(res)]))
  }
 

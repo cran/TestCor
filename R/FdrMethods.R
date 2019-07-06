@@ -51,9 +51,9 @@ LCTnorm <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
  if(vect==TRUE){
    return(result)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(result)],columns[which(result)]))
  }
 
@@ -127,9 +127,9 @@ LCTboot <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE){
  if(vect==TRUE){
    return(result)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(result)],columns[which(result)]))
  }
 }
@@ -191,9 +191,9 @@ BHCor <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
  if(vect==TRUE){
    return(result)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(result)],columns[which(result)]))
  }
 }
@@ -272,9 +272,9 @@ BHBootCor <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE)
  if(vect==TRUE){
    return(result)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(result)],columns[which(result)]))
  }
 }

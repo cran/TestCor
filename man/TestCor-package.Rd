@@ -24,9 +24,9 @@
  }
 Functions \code{SimuFwer} and \code{SimuFdr} provide simulations of Gaussian random variables for a given correlation matrix and return estimated FWER, FDR, Power and true discovery rate obtained applying one of the procedure above. Some example of results obtained can be found in Chapter 6 of Roux (2018). 
 }
-\author{Irène Gannaz and Marine Roux
+\author{Irene Gannaz and Marine Roux
 
-Maintainer: Irène Gannaz <irene.gannaz@insa-lyon.fr>
+Maintainer: Irene Gannaz <irene.gannaz@insa-lyon.fr>
 }
 \references{
 Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the royal statistical society. Series B (Methodological), 289-300, \url{https://doi.org/10.1111/j.2517-6161.1995.tb02031.x}.
@@ -43,7 +43,7 @@ Roux, M. (2018). Graph inference by multiple testing with application to Neuroim
 
 Šidák, Z. (1967). Rectangular confidence regions for the means of multivariate normal distributions. Journal of the American Statistical Association, 62(318), 626-633.
 }
-\keyword{multiple testing, FWER, FDR, correlation test, graph inference}
+\concept{multiple testing} \concept{FWER} \concept{FDR} \concept{correlation testing} \concept{graph inference}
 
 \examples{
 \donttest{

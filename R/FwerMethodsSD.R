@@ -39,15 +39,21 @@
 #' res <- BonferroniCor_SD(data,alpha,stat_test='empirical')
 BonferroniCor_SD <- function(data,alpha,stat_test='empirical',vect=FALSE){
 
-  vBonf <- BonferroniCor(data,alpha,stat_test,vect=TRUE)
+	stat <- abs(eval_stat(data, stat_test))
+    m <- length(stat)
+    t_bonf <- qnorm(1 - alpha/(2 * m))
+	vBonf <- (stat > t_bonf)
 
-  res_SD <- rep(0,length(vBonf))
-  indNR <- which(vBonf==0)   # indexes of non rejected hypothesis 
-  indR <- which(vBonf!=0)               
-  res_SD[indR] <- 1
+    res_SD <- rep(0, length(vBonf))
+    indNR <- which(vBonf == 0)
+    indR <- which(vBonf != 0)
+    res_SD[indR] <- 1
 	
   while((sum(vBonf)!=0)&&(sum(indNR)!=0)){
-  	vBonf <- BonferroniCor(data[,indNR],alpha,stat_test,vect=TRUE)
+      stat_SD <- stat[indNR]
+      m <- length(stat_SD)
+      t_bonf <- qnorm(1 - alpha/(2 * m))
+	  vBonf <- (stat_SD > t_bonf)
 
 	  indR <- which(vBonf !=0)            
 	  res_SD[indNR[indR]] <- 1
@@ -58,9 +64,9 @@ BonferroniCor_SD <- function(data,alpha,stat_test='empirical',vect=FALSE){
  if(vect==TRUE){
    return(res_SD)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(res_SD)],columns[which(res_SD)]))
  }
 }
@@ -103,7 +109,10 @@ BonferroniCor_SD <- function(data,alpha,stat_test='empirical',vect=FALSE){
 #' res <- SidakCor_SD(data,alpha,stat_test='empirical')
 SidakCor_SD <- function(data,alpha,stat_test='empirical',vect=FALSE){
 
-  vSidak <- SidakCor(data,alpha,stat_test,vect=TRUE)
+	stat <- abs(eval_stat(data,stat_test))
+    m <- length(stat)
+    t_sidak <- qnorm(0.5*((1-alpha)^(1/m))+0.5)
+    vSidak  <- (stat > t_sidak)
 
   res_SD <- rep(0,length(vSidak))
   indNR <- which(vSidak==0)   # indexes of non rejected hypothesis 
@@ -111,8 +120,11 @@ SidakCor_SD <- function(data,alpha,stat_test='empirical',vect=FALSE){
   res_SD[indR] <- 1
 	
   while((sum(vSidak)!=0)&&(sum(indNR)!=0)){
+      stat_SD <- stat[indNR]
+      m <- length(stat_SD)
+      t_sidak <- qnorm(0.5*((1-alpha)^(1/m))+0.5)
+      vSidak  <- (stat_SD > t_sidak)
 
-  	vSidak <- SidakCor(data[,indNR],alpha,stat_test,vect=TRUE)
 
 	  indR <- which(vSidak !=0)            
 	  res_SD[indNR[indR]] <- 1
@@ -123,9 +135,9 @@ SidakCor_SD <- function(data,alpha,stat_test='empirical',vect=FALSE){
  if(vect==TRUE){
    return(res_SD)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(res_SD)],columns[which(res_SD)]))
  }
 }
@@ -180,7 +192,7 @@ BootRWCor_SD <- function(data,alpha,stat_test='empirical',Nboot=1000,vect=FALSE)
   indR <- which(vBootRW!=0)               
   res_SD[indR] <- 1
 	
-  n <- nrow(data)
+  n <- ncol(data)
 
   stat <- eval_stat(data,stat_test)
    
@@ -215,9 +227,9 @@ BootRWCor_SD <- function(data,alpha,stat_test='empirical',Nboot=1000,vect=FALSE)
  if(vect==TRUE){
    return(res_SD)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(res_SD)],columns[which(res_SD)]))
  }
 	
@@ -273,6 +285,7 @@ maxTinftyCor_SD <- function(data,alpha=0.05,stat_test='empirical',Nboot=1000,Ome
 
   vmaxTinf <- maxTinftyCor(data,alpha,stat_test,Nboot,OmegaChap,vect=TRUE)
 
+  stat <- abs(eval_stat(data,stat_test))
   res_SD <- rep(0,length(vmaxTinf))
   indNR <- which(vmaxTinf==0)   # indexes of non rejected hypothesis 
   indR <- which(vmaxTinf!=0)               
@@ -280,8 +293,15 @@ maxTinftyCor_SD <- function(data,alpha=0.05,stat_test='empirical',Nboot=1000,Ome
 
 	
   while((sum(vmaxTinf)!=0)&&(sum(indNR)!=0)){
-      vmaxTinf <- maxTinftyCor(data[,indNR],alpha,stat_test,Nboot,OmegaChap[indNR,indNR],vect=TRUE) 
-        
+    stat_SD <- stat[indNR]
+    OmegaChap_SD <- OmegaChap[indNR,indNR]
+ 
+    # evaluation of the (1-alpha/2)-quantile of a N(0,OmegaChap) by simulation
+    dataq <- mvrnorm(Nboot,rep(0,nrow(OmegaChap_SD)),OmegaChap_SD)
+    maxq <- apply(as.matrix(dataq),1,function(x){max(abs(x))})
+    t_maxTinfty <- quantile(maxq,1-alpha,names=FALSE)
+    vmaxTinf <- (stat_SD > t_maxTinfty)
+    
       indR <- which(vmaxTinf !=0)            
       res_SD[indNR[indR]] <- 1
       indNR <- indNR[-indR]
@@ -291,9 +311,9 @@ maxTinftyCor_SD <- function(data,alpha=0.05,stat_test='empirical',Nboot=1000,Ome
  if(vect==TRUE){
    return(res_SD)
  }else{
-   n <- nrow(data)
-   rows <- vectorize(matrix(1:n,nrow=n,ncol=n))
-   columns <- vectorize(t(matrix(1:n,nrow=n,ncol=n)))
+   p <- ncol(data)
+   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
+   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
    return(cbind(rows[which(res_SD)],columns[which(res_SD)]))
  }
 	
