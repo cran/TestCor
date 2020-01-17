@@ -297,11 +297,11 @@ maxTinftyCor_SD <- function(data,alpha=0.05,stat_test='empirical',Nboot=1000,Ome
     OmegaChap_SD <- OmegaChap[indNR,indNR]
  
     # evaluation of the (1-alpha/2)-quantile of a N(0,OmegaChap) by simulation
-    dataq <- mvrnorm(Nboot,rep(0,nrow(OmegaChap_SD)),OmegaChap_SD)
-    maxq <- apply(as.matrix(dataq),1,function(x){max(abs(x))})
+    dataq <- abs(mvrnorm(Nboot,rep(0,nrow(OmegaChap_SD)),OmegaChap_SD))
+    maxq <- dataq[cbind(1:nrow(dataq),max.col(dataq))]
     t_maxTinfty <- quantile(maxq,1-alpha,names=FALSE)
     vmaxTinf <- (stat_SD > t_maxTinfty)
-    
+
       indR <- which(vmaxTinf !=0)            
       res_SD[indNR[indR]] <- 1
       indNR <- indNR[-indR]

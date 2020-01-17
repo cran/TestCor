@@ -140,7 +140,7 @@ SimuFwer_oracle <- function(corr_theo,n=100,Nsimu=1,alpha=0.05,stat_test='empiri
 	}
 
   # return fwer, fdr, power, tdr
-  res  <- c(mean(false_positive>0),mean(false_positive),mean(true_positive),mean(ifelse(nb_rejet==0,0,true_positive/nb_rejet*sum(H1))))
+res  <- c(mean(false_positive>0),mean(false_positive),mean(true_positive),mean(ifelse(nb_rejet==0,0,true_positive/nb_rejet*sum(H1))))
   names(res) <- c('fwer','fdr','power','tdr')
 
 	
