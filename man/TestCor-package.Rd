@@ -24,7 +24,7 @@
  }
 Functions \code{SimuFwer} and \code{SimuFdr} provide simulations of Gaussian random variables for a given correlation matrix and return estimated FWER, FDR, Power and true discovery rate obtained applying one of the procedure above. Some example of results obtained can be found in Chapter 6 of Roux (2018). 
 }
-\author{Irene Gannaz and Marine Roux
+\author{Irene Gannaz
 
 Maintainer: Irene Gannaz <irene.gannaz@insa-lyon.fr>
 }

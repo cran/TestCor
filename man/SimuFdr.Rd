@@ -33,7 +33,7 @@ and 'BHboot', Benjamini-Hochberg (1995)'s procedure with bootstrap evaluation of
 \item{seed}{seed for the Gaussian simulations}
 }
 \value{
-Returns a line vector containing estimated fwer, estimated fdr, estimated power, estimated true discovery rate.
+Returns a line vector containing estimated values for fwer, fdr, sensitivity, specificity and accuracy.
 }
 \description{
 Simulates Gaussian data with a given correlation matrix and applies a FDR controlling procedure on the correlations.
@@ -43,8 +43,10 @@ Nsimu <- 1000
 n <- 100
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
 alpha <- 0.05
-res <- SimuFdr(corr_theo,n,Nsimu,alpha,stat_test='empirical',method='LCTnorm')
+SimuFdr(corr_theo,n,Nsimu,alpha,stat_test='empirical',method='LCTnorm')
 }
 \references{
 Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the royal statistical society. Series B (Methodological), 289-300.

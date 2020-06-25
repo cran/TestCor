@@ -5,27 +5,31 @@
 \title{Bootstrap multiple testing method of Romano & Wolf (2005) for correlations.}
 \usage{
 BootRWCor(data, alpha = 0.05, stat_test = "empirical", Nboot = 1000,
-  vect = FALSE)
+  vect = FALSE, logical = FALSE, arr.ind = FALSE)
 }
 \arguments{
 \item{data}{matrix of observations}
 
-\item{alpha}{level of multiple testing}
+\item{alpha}{level of multiple testing (used if logical=TRUE)}
 
 \item{stat_test}{\describe{
   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
   \item{'fisher'}{   \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
   \item{'student'}{  \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-  \item{'gaussian'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+  \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 }}
 
-\item{Nboot}{number of iterations for Bootstrap quantile evaluation}
+\item{Nboot}{number of iterations for Monte-Carlo quantile evaluation}
 
-\item{vect}{if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-if FALSE, returns an array containing rows and columns of significative correlations}
+\item{vect}{if TRUE returns a vector of adjusted p-values, corresponding to \code{vectorize(cor(data))};
+if FALSE, returns an array containing the adjusted p-values for each entry of the correlation matrix}
+
+\item{logical}{if TRUE, returns either a vector or a matrix where each element is equal to TRUE if the corresponding null hypothesis is rejected, and to FALSE if it is not rejected}
+
+\item{arr.ind}{if TRUE, returns the indexes of the significant correlations, with respect to level alpha}
 }
 \value{
-Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+Returns  \itemize{\item{the adjusted p-values, as a vector or a matrix depending of the value of \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 }
 \description{
 Multiple testing method based on the evaluation of quantile by bootstrap 
@@ -36,9 +40,17 @@ in the initial dataset (Romano & Wolf (2005)).
 n <- 100
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
 data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
+# adjusted p-values
+res <- BootRWCor(data,stat_test='empirical',Nboot=1000)
+round(res,2)
+# significant correlations with level alpha:
 alpha <- 0.05
-res <- BootRWCor(data,alpha,stat_test='empirical',Nboot=1000)
+whichCor(res<alpha)
+# directly
+BootRWCor(data,alpha,stat_test='empirical',Nboot=1000,arr.ind=TRUE)
 }
 \references{
 Romano, J. P., & Wolf, M. (2005). Exact and approximate stepdown methods for multiple hypothesis testing. Journal of the American Statistical Association, 100(469), 94-108.

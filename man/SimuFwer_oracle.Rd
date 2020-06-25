@@ -33,7 +33,7 @@ SimuFwer_oracle(corr_theo, n = 100, Nsimu = 1, alpha = 0.05,
 \item{seed}{seed for the Gaussian simulations}
 }
 \value{
-Returns a line vector containing estimated fwer, estimated fdr, estimated power, estimated true discovery rate.
+Returns a line vector containing estimated values for fwer, fdr, sensitivity, specificity and accuracy.
 }
 \description{
 Simulates Gaussian data with a given correlation matrix and applies oracle MaxTinfty (i.e. Drton & Perlman (2007)'s procedure with the true correlation matrix) on the correlations.
@@ -43,8 +43,10 @@ Nsimu <- 1000
 n <- 50
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
 alpha <- 0.05
-res <- SimuFwer_oracle(corr_theo,n,Nsimu,alpha,stat_test='empirical',stepdown=FALSE,Nboot=100)
+SimuFwer_oracle(corr_theo,n,Nsimu,alpha,stat_test='empirical',stepdown=FALSE,Nboot=100)
 }
 \references{
 Drton, M., & Perlman, M. D. (2007). Multiple testing and error control in Gaussian graphical model selection. Statistical Science, 22(3), 430-449.

@@ -5,25 +5,32 @@
 \title{Sidak multiple testing method for correlations
 with stepdown procedure.}
 \usage{
-SidakCor_SD(data, alpha, stat_test = "empirical", vect = FALSE)
+SidakCor_SD(data, alpha = 0.05, stat_test = "empirical",
+  vect = FALSE, logical = TRUE, arr.ind = FALSE)
 }
 \arguments{
 \item{data}{matrix of observations}
 
 \item{alpha}{level of multiple testing}
 
-\item{stat_test}{\describe{
-  \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
-  \item{'fisher'}{\eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
-  \item{'student'}{\eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-  \item{'gaussian'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+\item{stat_test}{4 test statistics are available:
+\describe{
+  \item{'empirical'}{ \eqn{\sqrt{n}*abs(corr)}}
+  \item{'fisher'}{ \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
+  \item{'student'}{ \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
+  \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 }}
 
 \item{vect}{if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-if FALSE, returns an array containing rows and columns of significative correlations}
+if FALSE, returns an array containing TRUE/FALSE values for each entry of the correlation matrix}
+
+\item{logical}{if TRUE, returns either a vector or a matrix where each element is equal to TRUE if the corresponding null hypothesis is rejected, and to FALSE if it is not rejected
+if FALSE, returns a list of successive p-values : element [[i+1]] of the list giving the p-values evaluated on the non-rejected hypothesis at step [[i]]; p-values are either as a vector or a list depending on \code{vect}}
+
+\item{arr.ind}{if TRUE, returns the indexes of the significant correlations, with respect to level alpha}
 }
 \value{
-Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+Returns  \itemize{\item{logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, as a vector or a matrix depending of the value of \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 }
 \description{
 Sidak multiple testing method for correlations
@@ -34,9 +41,17 @@ with stepdown procedure.
 n <- 100
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
 data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
 alpha <- 0.05
-res <- SidakCor_SD(data,alpha,stat_test='empirical')
+# significant correlations:
+SidakCor_SD(data,alpha,stat_test='empirical', arr.ind=TRUE)
+# successive p-values
+res <- SidakCor_SD(data,stat_test='empirical', logical=FALSE)
+lapply(res,FUN=function(x){round(x,2)})
+# succesive rejections
+lapply(res,FUN=function(x){whichCor(x<alpha)})  
 }
 \references{
 Roux, M. (2018). Graph inference by multiple testing with application to Neuroimaging, Ph.D., Université Grenoble Alpes, France, https://tel.archives-ouvertes.fr/tel-01971574v1.

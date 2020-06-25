@@ -18,3 +18,6 @@ Returns a vector containing the upper triangle of a matrix, without the diagonal
 \examples{
 vectorize(matrix(1:9,3,3))
 }
+\seealso{
+unvectorize
+}

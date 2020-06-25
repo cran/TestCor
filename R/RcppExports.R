@@ -5,12 +5,26 @@
 #'
 #' @param mat a square matrix
 #' @return Returns a vector containing the upper triangle of a matrix, without the diagonal.
+#' @seealso unvectorize
 #' @export
 #'
 #' @examples
 #' vectorize(matrix(1:9,3,3))
 vectorize <- function(mat) {
     .Call('_TestCor_vectorize', PACKAGE = 'TestCor', mat)
+}
+
+#' Returns an upper-triangle matrix, without the diagonal, containing the elements of a given vector.
+#'
+#' @param vect A vector containing the upper triangle of a matrix, without the diagonal
+#' @return Returns an upper-triangle matrix where each entry is given by the vector containing the upper triangle of a matrix, without the diagonal.
+#' @seealso vectorize
+#' @export
+#'
+#' @examples
+#' unvectorize(1:10)
+unvectorize <- function(vect) {
+    .Call('_TestCor_unvectorize', PACKAGE = 'TestCor', vect)
 }
 
 #' Returns the theoretical covariance of empirical correlations.
@@ -29,5 +43,23 @@ vectorize <- function(mat) {
 #' covDcor(corr_theo)
 covDcor <- function(r) {
     .Call('_TestCor_covDcor', PACKAGE = 'TestCor', r)
+}
+
+#' Returns the theoretical covariance of empirical correlations.
+#'
+#' @param r a correlation matrix
+#' @return Returns the theoretical covariance of 2nd order statistics, 
+#'         \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}.
+#' @export
+#' @seealso covDcor
+#'
+#' @examples
+#' p <- 10
+#' corr_theo <- diag(1,p)
+#' corr_theo[2:p,] <- 0.3
+#' corr_theo[,2:p] <- 0.3
+#' covD2nd(corr_theo)
+covD2nd <- function(r) {
+    .Call('_TestCor_covD2nd', PACKAGE = 'TestCor', r)
 }
 

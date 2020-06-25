@@ -4,8 +4,8 @@
 \alias{BHBootCor}
 \title{Benjamini & Hochberg (1995)'s procedure for correlation testing with bootstrap evaluation of p-values.}
 \usage{
-BHBootCor(data, alpha = 0.05, stat_test = "gaussian", Nboot = 100,
-  vect = FALSE)
+BHBootCor(data, alpha = 0.05, stat_test = "2nd.order", Nboot = 100,
+  vect = FALSE, arr.ind = FALSE)
 }
 \arguments{
 \item{data}{matrix of observations}
@@ -16,16 +16,18 @@ BHBootCor(data, alpha = 0.05, stat_test = "gaussian", Nboot = 100,
   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
   \item{'fisher'}{   \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
   \item{'student'}{  \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-  \item{'gaussian'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+  \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 }}
 
 \item{Nboot}{number of iterations for bootstrap quantile evaluation}
 
 \item{vect}{if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-if FALSE, returns an array containing rows and columns of significative correlations}
+if FALSE, returns an array containing TRUE/FALSE values for each entry of the correlation matrix}
+
+\item{arr.ind}{if TRUE, returns the indexes of the significant correlations, with respect to level alpha}
 }
 \value{
-Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+Returns \itemize{\item{a vector or a matrix of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{arr.ind=FALSE},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 }
 \description{
 Benjamini & Hochberg (1995)'s procedure on the correlation matrix entries with bootstrap evaluation of p-values (no theoretical proof of control).
@@ -35,9 +37,12 @@ Benjamini & Hochberg (1995)'s procedure on the correlation matrix entries with b
 n <- 100
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
 data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
 alpha <- 0.05
-res <- BHBootCor(data,alpha,stat_test='empirical')
+# significant correlations:
+BHBootCor(data,alpha,stat_test='empirical',arr.ind=TRUE)
 }
 \references{
 Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the royal statistical society. Series B (Methodological), 289-300.

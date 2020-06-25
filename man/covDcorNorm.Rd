@@ -7,14 +7,14 @@
 covDcorNorm(cor_mat, stat_test = "empirical")
 }
 \arguments{
-\item{cor_mat}{a correlation matrix}
+\item{cor_mat}{A correlation matrix}
 
 \item{stat_test}{\describe{
   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
   \item{'fisher'}{\eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
   \item{'student'}{\eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-}
-Notice that 'gaussian' is not available.}
+  \item{'2nd.order'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+}}
 }
 \value{
 Returns the theoretical covariance of the test statistics.
@@ -30,5 +30,5 @@ corr_theo[,2:p] <- 0.3
 covDcorNorm(corr_theo,stat_test='student')
 }
 \seealso{
-covDcor, eval_stat
+covDcor, covD2nd, eval_stat
 }

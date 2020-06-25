@@ -5,25 +5,29 @@
 \title{Bonferroni multiple testing procedure for correlations.}
 \usage{
 BonferroniCor(data, alpha = 0.05, stat_test = "empirical",
-  vect = FALSE)
+  vect = FALSE, logical = FALSE, arr.ind = FALSE)
 }
 \arguments{
 \item{data}{matrix of observations}
 
-\item{alpha}{level of multiple testing}
+\item{alpha}{level of multiple testing (used if logical=TRUE)}
 
 \item{stat_test}{\describe{
   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
   \item{'fisher'}{   \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
   \item{'student'}{  \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-  \item{'gaussian'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+  \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 }}
 
-\item{vect}{if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-if FALSE, returns an array containing rows and columns of significative correlations}
+\item{vect}{if TRUE returns a vector of adjusted p-values, corresponding to \code{vectorize(cor(data))};
+if FALSE, returns an array containing the adjusted p-values for each entry of the correlation matrix}
+
+\item{logical}{if TRUE, returns either a vector or a matrix where each element is equal to TRUE if the corresponding null hypothesis is rejected, and to FALSE if it is not rejected}
+
+\item{arr.ind}{if TRUE, returns the indexes of the significant correlations, with respect to level alpha}
 }
 \value{
-Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+Returns  \itemize{\item{the adjusted p-values, as a vector or a matrix depending of the value of \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 }
 \description{
 Bonferroni multiple testing procedure for correlations.
@@ -32,11 +36,18 @@ Bonferroni multiple testing procedure for correlations.
 n <- 100
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
+corr_theo <- diag(1,p)
 data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
-corr_mat <- cor(data)
-corr_vect <- corr_mat[upper.tri(corr_mat)]
+# adjusted p-values
+res <- BonferroniCor(data,stat_test='empirical')
+round(res,2)
+# significant correlations with level alpha:
 alpha <- 0.05
-res <- BonferroniCor(data,alpha,stat_test='empirical')
+whichCor(res<alpha)
+# directly
+BonferroniCor(data,alpha,stat_test='empirical',arr.ind=TRUE)
 }
 \references{
 Bonferroni, C. E. (1935). Il calcolo delle assicurazioni su gruppi di teste. Studi in onore del professore salvatore ortu carboni, 13-60.

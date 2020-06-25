@@ -10,12 +10,13 @@
 #'   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
 #'   \item{'fisher'}{   \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
 #'   \item{'student'}{  \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-#'   \item{'gaussian'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+#'   \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 #' }
 #' @param vect      if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-#'                  if FALSE, returns an array containing rows and columns of significative correlations 
+#'                  if FALSE, returns an array containing TRUE/FALSE values for each entry of the correlation matrix
+#' @param arr.ind   if TRUE, returns the indexes of the significant correlations, with respect to level alpha
 #'
-#' @return Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+#' @return Returns  \itemize{\item{logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, as a vector or a matrix depending of the value of \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 #'
 #' @importFrom stats cor quantile var
 #' 
@@ -27,35 +28,37 @@
 #' n <- 100
 #' p <- 10
 #' corr_theo <- diag(1,p)
+#' corr_theo[1,3] <- 0.5
+#' corr_theo[3,1] <- 0.5
 #' data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
 #' alpha <- 0.05
-#' res <- LCTnorm(data,alpha,stat_test='empirical')
-LCTnorm <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
+#' # significant correlations:
+#' LCTnorm(data,alpha,stat_test='empirical',arr.ind=TRUE)
+LCTnorm <- function(data,alpha=0.05,stat_test='2nd.order',vect=FALSE,arr.ind=FALSE){
 
-    p <- ncol(data)	
+  if(sum(stat_test==c('empirical','fisher','student','2nd.order'))==0){ stop('Wrong value for stat_test.')}
+  
+  p <- ncol(data)	
 
-    # test statistic	
+  # test statistic	
  	stat <- abs(eval_stat(data,stat_test))
 	m <- length(stat)
-    stat_sort <- sort(stat,index.return=TRUE,decreasing=TRUE)
+  stat_sort <- sort(stat,index.return=TRUE,decreasing=TRUE)
   
 	# evaluation of pval by normal approximation
 	pval <- 2*(1-pnorm(stat_sort$x))
      
     # truncated BH threshold   
-    ind <- which( ( pval < alpha*seq(1,m,1)/m )&( stat_sort$x < sqrt(4*log(p)-2*log(log(p))) ) )
+    ind <- which( ( pval < alpha*seq(1,m,1)/m )&( stat_sort$x <= sqrt(4*log(p)-2*log(log(p))) ) )
     t <- ifelse(length(ind)==0, 2*sqrt(log(p)), stat_sort$x[max(ind)] )
 
-	result <- (stat > t)
+	res <- (stat >= t) #################### 
 
- if(vect==TRUE){
-   return(result)
- }else{
-   p <- ncol(data)
-   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
-   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
-   return(cbind(rows[which(result)],columns[which(result)]))
- }
+	if(arr.ind){ vect <- FALSE }
+	if(!vect){ res <- (unvectorize(res)>0) }
+	if(arr.ind){ res <- whichCor(res) }
+	
+	return(res)
 
 }
 
@@ -72,13 +75,14 @@ LCTnorm <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
 #'   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
 #'   \item{'fisher'}{\eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
 #'   \item{'student'}{\eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-#'   \item{'gaussian'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+#'   \item{'2nd.order'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 #' }
 #' @param Nboot         number of iterations for bootstrap quantile evaluation
 #' @param vect          if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-#'                      if FALSE, returns an array containing rows and columns of significative correlations 
+#'                      if FALSE, returns an array containing TRUE/FALSE values for each entry of the correlation matrix
+#' @param arr.ind   if TRUE, returns the indexes of the significant correlations, with respect to level alpha
 #'
-#' @return Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+#' @return Returns  \itemize{\item{logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, as a vector or a matrix depending of the value of \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 #'
 #' @importFrom stats cor quantile var
 #' 
@@ -90,18 +94,23 @@ LCTnorm <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
 #' n <- 100
 #' p <- 10
 #' corr_theo <- diag(1,p)
+#' corr_theo[1,3] <- 0.5
+#' corr_theo[3,1] <- 0.5
 #' data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
 #' alpha <- 0.05
-#' res <- LCTboot(data,alpha,stat_test='empirical',Nboot=100)
-LCTboot <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE){
+#' # significant correlations:
+#' LCTboot(data,alpha,stat_test='empirical',Nboot=100,arr.ind=TRUE)
+LCTboot <- function(data,alpha=0.05,stat_test='2nd.order',Nboot=100,vect=FALSE,arr.ind=FALSE){
  
+  if(sum(stat_test==c('empirical','fisher','student','2nd.order'))==0){ stop('Wrong value for stat_test.')}
+  
     n <- nrow(data)
     p <- ncol(data)
 	
-    # test statistic	
+  # test statistic	
  	stat <- abs(eval_stat(data,stat_test))
 	m <- length(stat)
-    stat_sort <- sort(stat,index.return=TRUE,decreasing=TRUE)
+  stat_sort <- sort(stat,index.return=TRUE,decreasing=TRUE)
 
 	# evaluation of pval by bootstrap
 	prop <- matrix(0,nrow=Nboot,ncol=m)	
@@ -119,19 +128,17 @@ LCTboot <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE){
 
     
     # truncated BH threshold   
-    ind <- which( ( pval_boot < alpha*seq(1,m,1)/m )&( stat_sort$x < sqrt(4*log(p)-2*log(log(p))) ) )
+    ind <- which( ( pval_boot <= alpha*seq(1,m,1)/m )&( stat_sort$x <= sqrt(4*log(p)-2*log(log(p))) ) )
     t_boot <- ifelse(length(ind)==0, 2*sqrt(log(p)), stat_sort$x[max(ind)])
 
-	result <- (stat > t_boot)
-
- if(vect==TRUE){
-   return(result)
- }else{
-   p <- ncol(data)
-   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
-   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
-   return(cbind(rows[which(result)],columns[which(result)]))
- }
+	res <- (stat >= t_boot)
+	
+	if(arr.ind){ vect <- FALSE }
+	if(!vect){ res <- (unvectorize(res)>0) }
+	if(arr.ind){ res <- whichCor(res) }
+	
+	return(res)
+	
 }
 
 
@@ -149,12 +156,13 @@ LCTboot <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE){
 #'   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
 #'   \item{'fisher'}{   \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
 #'   \item{'student'}{  \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-#'   \item{'gaussian'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+#'   \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 #' }
 #' @param vect      if TRUE returns a vector of TRUE/FALSE values, corresponding to vectorize(cor(data))
-#'                  if FALSE, returns an array containing rows and columns of significative correlations 
+#'                  if FALSE, returns an array containing TRUE/FALSE values for each entry of the correlation matrix
+#' @param arr.ind   if TRUE, returns the indexes of the significant correlations, with respect to level alpha
 #'
-#' @return Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+#' @return Returns  \itemize{\item{logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, as a vector or a matrix depending of the value of \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 #'
 #' @importFrom stats cor quantile pnorm
 #' 
@@ -166,19 +174,23 @@ LCTboot <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE){
 #' n <- 100
 #' p <- 10
 #' corr_theo <- diag(1,p)
+#' corr_theo[1,3] <- 0.5
+#' corr_theo[3,1] <- 0.5
 #' data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
 #' alpha <- 0.05
-#' res <- BHCor(data,alpha,stat_test='empirical')
+#' # significant correlations:
+#' BHCor(data,alpha,stat_test='empirical',arr.ind=TRUE)
+BHCor <- function(data,alpha=0.05,stat_test='2nd.order',vect=FALSE,arr.ind=FALSE){
 
-BHCor <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
-
+  if(sum(stat_test==c('empirical','fisher','student','2nd.order'))==0){ stop('Wrong value for stat_test.')}
+  
     p <- ncol(data)	
 
-    # test statistic	
+  # test statistic	
  	stat <- abs(eval_stat(data,stat_test))
-    m <- length(stat)
-    pval <- 2*(1-pnorm(stat))
-    thresholds_BH <- alpha*seq(1,m,1)/m
+  m <- length(stat)
+  pval <- 2*(1-pnorm(stat))
+  thresholds_BH <- alpha*seq(1,m,1)/m
 
     pval_sort <- sort(pval,index.return=TRUE)
     result <- (pval_sort$x <= thresholds_BH)
@@ -187,15 +199,14 @@ BHCor <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
 	  result <- rep(0,m)
 	  result[pval_sort$ix[1:ind_max]] <- 1
     }
-
- if(vect==TRUE){
-   return(result)
- }else{
-   p <- ncol(data)
-   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
-   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
-   return(cbind(rows[which(result)],columns[which(result)]))
- }
+    
+    res <- (result>0)
+    if(arr.ind){ vect <- FALSE }
+    if(!vect){ res <- (unvectorize(result)>0) }
+    if(arr.ind){ res <- whichCor(res) }
+    
+    return(res)
+    
 }
 
 
@@ -207,21 +218,21 @@ BHCor <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
 #' Benjamini & Hochberg (1995)'s procedure for correlation testing with bootstrap evaluation of p-values.
 #' @description Benjamini & Hochberg (1995)'s procedure on the correlation matrix entries with bootstrap evaluation of p-values (no theoretical proof of control).
 #'
-#' @param data         matrix of observations
-#' @param alpha        level of multiple testing
+#' @param data      matrix of observations
+#' @param alpha      level of multiple testing
 #' @param stat_test     
 #' \describe{
 #'   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
 #'   \item{'fisher'}{   \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
 #'   \item{'student'}{  \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-#'   \item{'gaussian'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+#'   \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 #' }
-#' @param Nboot       number of iterations for bootstrap quantile evaluation
-#' @param vect        if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-#'                    if FALSE, returns an array containing rows and columns of significative correlations 
+#' @param Nboot     number of iterations for bootstrap quantile evaluation
+#' @param vect      if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
+#'                  if FALSE, returns an array containing TRUE/FALSE values for each entry of the correlation matrix
+#' @param arr.ind   if TRUE, returns the indexes of the significant correlations, with respect to level alpha
 #'
-#'
-#' @return Returns \itemize{\item{a vector of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{vect=TRUE},} \item{a vector containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significative, if \code{vect=FALSE}.}}
+#' @return Returns \itemize{\item{a vector or a matrix of logicals, equal to TRUE if the corresponding element of the statistic vector is rejected, if \code{arr.ind=FALSE},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 #'
 #' @importFrom stats cor quantile pnorm
 #' 
@@ -233,18 +244,23 @@ BHCor <- function(data,alpha=0.05,stat_test='gaussian',vect=FALSE){
 #' n <- 100
 #' p <- 10
 #' corr_theo <- diag(1,p)
+#' corr_theo[1,3] <- 0.5
+#' corr_theo[3,1] <- 0.5
 #' data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
 #' alpha <- 0.05
-#' res <- BHBootCor(data,alpha,stat_test='empirical')
-BHBootCor <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE){
+#' # significant correlations:
+#' BHBootCor(data,alpha,stat_test='empirical',arr.ind=TRUE)
+BHBootCor <- function(data,alpha=0.05,stat_test='2nd.order',Nboot=100,vect=FALSE,arr.ind=FALSE){
  	
+  if(sum(stat_test==c('empirical','fisher','student','2nd.order'))==0){ stop('Wrong value for stat_test.')}
+  
     n <- nrow(data)
     p <- ncol(data)
 	
-    # test statistic	
+  # test statistic	
  	stat <- abs(eval_stat(data,stat_test))
 	m <- length(stat)
-    stat_sort <- sort(stat,index.return=TRUE,decreasing=TRUE)
+  stat_sort <- sort(stat,index.return=TRUE,decreasing=TRUE)
 
 	# evaluation of pval by bootstrap
 	prop <- matrix(0,nrow=Nboot,ncol=m)	
@@ -255,10 +271,10 @@ BHBootCor <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE)
 		statb <- abs(eval_stat(datab,stat_test))
 		
 		# comparison with stat test
-        for(i in 1:m){
+    for(i in 1:m){
 		  prop[nboot,i] <- mean(statb > stat_sort$x[i]) } 
-	}
-	pval_boot <- colMeans(prop)
+	  }
+	  pval_boot <- colMeans(prop)
 
     thresholds_BH <- alpha*seq(1,m,1)/m
     pval_sort <- sort(pval_boot,index.return=TRUE)
@@ -268,15 +284,14 @@ BHBootCor <- function(data,alpha=0.05,stat_test='gaussian',Nboot=100,vect=FALSE)
 	  result <- rep(0,m)
 	  result[pval_sort$ix[1:ind_max]] <- 1
     }
+    
+    res <- (result>0)
+    if(arr.ind){ vect <- FALSE }
+    if(!vect){ res <- (unvectorize(res)>0) }
+    if(arr.ind){ res <- whichCor(res) }
+    
+    return(res)
 
- if(vect==TRUE){
-   return(result)
- }else{
-   p <- ncol(data)
-   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
-   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
-   return(cbind(rows[which(result)],columns[which(result)]))
- }
 }
 
 

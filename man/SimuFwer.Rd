@@ -5,7 +5,7 @@
 \title{Simulates Gaussian data with a given correlation matrix and applies a FWER controlling procedure on the correlations.}
 \usage{
 SimuFwer(corr_theo, n = 100, Nsimu = 1, alpha = 0.05,
-  stat_test = "empirical", method = "MaxTinfty", Nboot = 1000,
+  stat_test = "empirical", method = "Sidak", Nboot = 1000,
   stepdown = TRUE, seed = NULL)
 }
 \arguments{
@@ -33,7 +33,7 @@ SimuFwer(corr_theo, n = 100, Nsimu = 1, alpha = 0.05,
 \item{seed}{seed for the Gaussian simulations}
 }
 \value{
-Returns a line vector containing estimated fwer, estimated fdr, estimated power, estimated true discovery rate.
+Returns a line vector containing estimated values for fwer, fdr, sensitivity, specificity and accuracy.
 }
 \description{
 Simulates Gaussian data with a given correlation matrix and applies a FWER controlling procedure on the correlations.
@@ -43,8 +43,10 @@ Nsimu <- 1000
 n <- 100
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
 alpha <- 0.05
-res <- SimuFwer(corr_theo,n,Nsimu,alpha,stat_test='empirical',method='Bonferroni',stepdown=FALSE)
+SimuFwer(corr_theo,n,Nsimu,alpha,stat_test='empirical',method='Bonferroni',stepdown=FALSE)
 }
 \references{
 Bonferroni, C. E. (1935). Il calcolo delle assicurazioni su gruppi di teste. Studi in onore del professore salvatore ortu carboni, 13-60.

@@ -5,7 +5,7 @@
 \title{Applies multiple testing procedures built to control (asymptotically) the FDR for correlation testing.}
 \usage{
 ApplyFdrCor(data, alpha = 0.05, stat_test = "empirical",
-  method = "LCTnorm", Nboot = 1000, vect = FALSE)
+  method = "LCTnorm", Nboot = 1000, vect = FALSE, arr.ind = FALSE)
 }
 \arguments{
 \item{data}{matrix of observations}
@@ -16,7 +16,7 @@ ApplyFdrCor(data, alpha = 0.05, stat_test = "empirical",
   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
   \item{'fisher'}{\eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
   \item{'student'}{\eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-  \item{'gaussian'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+  \item{'2nd.order'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 }}
 
 \item{method}{choice between 'LCTnorm' and 'LCTboot' developped by Cai & Liu (2016), 
@@ -26,10 +26,12 @@ and 'BHboot', Benjamini-Hochberg (1995)'s procedure with bootstrap evaluation of
 \item{Nboot}{number of iterations for bootstrap p-values evaluation}
 
 \item{vect}{if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-if FALSE, returns an array containing rows and columns of significative correlations}
+if FALSE, returns an array containing rows and columns of significant correlations}
+
+\item{arr.ind}{if TRUE, returns the indexes of the significant correlations, with repspect to level alpha}
 }
 \value{
-Returns the list of significative correlations according to the multiple testing procedure applied.
+Returns either \itemize{\item{logicals indicating if the corresponding correlation is significant, as a vector or a matrix depending on \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 }
 \description{
 Applies multiple testing procedures built to control (asymptotically) the FDR for correlation testing.
@@ -39,9 +41,13 @@ Some have no theoretical proofs for tests on a correlation matrix.
 n <- 100
 p <- 10
 corr_theo <- diag(1,p)
+corr_theo[1,3] <- 0.5
+corr_theo[3,1] <- 0.5
 data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
+res <- ApplyFdrCor(data,stat_test='empirical',method='LCTnorm')
+# significant correlations, level alpha:
 alpha <- 0.05
-res <- ApplyFdrCor(data,alpha,stat_test='empirical',method='LCTnorm')
+whichCor(res<alpha)
 }
 \references{
 Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the royal statistical society. Series B (Methodological), 289-300.

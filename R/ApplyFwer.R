@@ -2,25 +2,28 @@
 #' for tests on a correlation matrix.
 #' @description Applies multiple testing procedures controlling (asymptotically) the FWER
 #' for tests on a correlation matrix.
-#' Methods are described in Chapter 5 of \cite{roux}.
+#' Methods are described in Chapter 5 of \cite{Roux (2018)}.
 #'
 #'
-#' @return Returns the list of significative correlations according to the multiple testing procedure applied
+#' @return  Returns either \itemize{\item{the adjusted p-values, as a vector or a matrix, depending on \code{vect}} \item{logicals indicating if the corresponding correlation is significant if \code{logical=TRUE}, as a vector or a matrix depending on \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 #
 #' @param data        matrix of observations
-#' @param alpha       level of multiple testing
+#' @param alpha       level of multiple testing (used if logical=TRUE)
 #' @param stat_test  
 #' \describe{
 #'   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
 #'   \item{'fisher'}{   \eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
 #'   \item{'student'}{  \eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-#'   \item{'gaussian'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+#'   \item{'2nd.order'}{ \eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 #' }
 #' @param method      choice between 'Bonferroni', 'Sidak', 'BootRW', 'MaxTinfty'
 #' @param Nboot       number of iterations for Monte-Carlo of bootstrap quantile evaluation
 #' @param stepdown    logical, if TRUE a stepdown procedure is applied
-#' @param vect        if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-#'                    if FALSE, returns an array containing rows and columns of significative correlations 
+#' @param vect         if TRUE returns a vector of adjusted p-values, corresponding to \code{vectorize(cor(data))};
+#'                     if FALSE, returns an array containing the adjusted p-values for each entry of the correlation matrix 
+#' @param logical      if TRUE, returns either a vector or a matrix where each element is equal to TRUE if the corresponding null hypothesis is rejected, and to FALSE if it is not rejected
+#'                     if \code{stepdown=TRUE} and \code{logical=FALSE}, returns a list of successive p-values.
+#' @param arr.ind      if TRUE, returns the indexes of the significant correlations, with repspect to level alpha
 #'
 #' @importFrom stats cor
 #' @importFrom MASS mvrnorm
@@ -39,42 +42,51 @@
 #' n <- 100
 #' p <- 10
 #' corr_theo <- diag(1,p)
+#' corr_theo[1,3] <- 0.5
+#' corr_theo[3,1] <- 0.5
 #' data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
+#' # adjusted p-values
+#' (res <- ApplyFwerCor(data,stat_test='empirical',method='Bonferroni',stepdown=FALSE))
+#' # significant correlations, level alpha:
 #' alpha <- 0.05
-#' res <- ApplyFwerCor(data,alpha,stat_test='empirical',method='Bonferroni',stepdown=FALSE)
-ApplyFwerCor <- function(data,alpha=0.05,stat_test='empirical',method='MaxTinfty',Nboot=1000,stepdown=TRUE, vect=FALSE){
-
+#' whichCor(res<alpha)
+ApplyFwerCor <- function(data,alpha=NULL,stat_test='empirical',method='Sidak',Nboot=1000,stepdown=TRUE,vect=FALSE,logical=stepdown,arr.ind=FALSE){
+ 
+ if(sum(stat_test==c('empirical','fisher','student','2nd.order'))==0){ stop('Wrong value for stat_test.')}
+ if(sum(method==c('Bonferroni','Sidak','BootRW','MaxTinfty'))==0){ stop('Wrong value for method.')}
+ # if( (!logical) & stepdown){
+ #    warning('Stepdown procedures do not return p-values, logical is changed in TRUE.\n')
+ #    logical = TRUE
+ # }
+ if(is.null(alpha) & (logical | arr.ind)){
+   warning('For logical or indexes returns, a value of alpha is needed. alpha=0.05 is taken.\n')
+   alpha = 0.05
+ }
+ if(arr.ind){ 
+   vect <- FALSE
+   logical <- TRUE 
+ }
+  
  if(method=='Bonferroni'){
-	if(stepdown==FALSE){ res <- BonferroniCor(data,alpha,stat_test,vect=TRUE) }
-	else{ res <- BonferroniCor_SD(data,alpha,stat_test,vect=TRUE) }
+	if(stepdown==FALSE){ res <- BonferroniCor(data,alpha,stat_test,vect,logical) }
+	else{ res <- BonferroniCor_SD(data,alpha,stat_test,vect,logical=logical) }
  } 
  if(method=='Sidak'){
-	if(stepdown==FALSE){ res <- SidakCor(data,alpha,stat_test,vect=TRUE) }
-	else{ res <- SidakCor_SD(data,alpha,stat_test,vect=TRUE) }
+	if(stepdown==FALSE){ res <- SidakCor(data,alpha,stat_test,vect,logical) }
+	else{ res <- SidakCor_SD(data,alpha,stat_test,vect,logical=logical) }
  }
  if(method=='BootRW'){
-	if(stepdown==FALSE){ res <- BootRWCor(data,alpha,stat_test,Nboot,vect=TRUE) }
-	else{ res <- BootRWCor_SD(data,alpha,stat_test,Nboot,vect=TRUE) }
+	if(stepdown==FALSE){ res <- BootRWCor(data,alpha,stat_test,Nboot,vect,logical) }
+	else{ res <- BootRWCor_SD(data,alpha,stat_test,Nboot,vect=vect,logical=logical) }
  }
  if(method=='MaxTinfty'){
-    if(stat_test=='gaussian'){
-        stop('MaxTinfty procedure is not implemented for Gaussian type statistics.\n')
-    }else{
-	    if(stepdown==FALSE){ res <- maxTinftyCor(data,alpha,stat_test,Nboot,vect=TRUE) }
-	    else{ res <- maxTinftyCor_SD(data,alpha,stat_test,Nboot,vect=TRUE) }
-    }
+    if(stepdown==FALSE){ res <- maxTinftyCor(data,alpha,stat_test,Nboot=Nboot,vect=vect,logical=logical) }
+    else{ res <- maxTinftyCor_SD(data,alpha,stat_test,Nboot,vect=vect,logical=logical) }
  }
- res <- as.logical(res)
-
-
- if(vect==TRUE){
-   return(res)
- }else{
-   p <- ncol(data)
-   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
-   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
-   return(cbind(rows[which(res)],columns[which(res)]))
- }
+  
+ if(arr.ind){ res <- whichCor(res) }
+  
+ return(res)
 
 }
  
@@ -82,26 +94,27 @@ ApplyFwerCor <- function(data,alpha=0.05,stat_test='empirical',method='MaxTinfty
 #' @description Applies oracle MaxTinfty procedure described in Drton & Perlman (2007) which controls asymptotically the FWER
 #' for tests on a correlation matrix. It needs the true correlation matrix. 
 #'
-#' @return Returns the list of significative correlations according to the multiple testing procedure applied
+#' @return  Returns either \itemize{\item{the adjusted p-values, as a vector or a matrix, depending on \code{vect} (unavailable with stepdown)} \item{logicals indicating if the corresponding correlation is significant if \code{logical=TRUE}, as a vector or a matrix depending on \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 #' Oracle estimation of the quantile is used, based on the true correlation matrix
 #'
 #' @param data          matrix of observations
-#' @param corr_theo     true matrix of corrlations
-#' @param alpha         level of multiple testing
+#' @param corr_theo     true matrix of correlations
+#' @param alpha        level of multiple testing (used if logical=TRUE)
 #' @param stat_test     
 #' \describe{
 #'   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
 #'   \item{'fisher'}{\eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
 #'   \item{'student'}{\eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-#'   \item{'gaussian'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+#'   \item{'2nd.order'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 #' }
-#'                      
 #' @param method        only 'MaxTinfty' implemented
 #' @param Nboot         number of iterations for Monte-Carlo of bootstrap quantile evaluation
-#' @param vect          optional, logical, if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-#'                     if FALSE, returns an array containing rows and columns of significative correlations 
 #' @param stepdown      logical, if TRUE a stepdown procedure is applied
-#'                      if FALSE, returns an array containing rows and columns of significative correlations   
+#' @param vect         if TRUE returns a vector of adjusted p-values, corresponding to \code{vectorize(cor(data))};
+#'                     if FALSE, returns an array containing the adjusted p-values for each entry of the correlation matrix 
+#' @param logical      if TRUE, returns either a vector or a matrix where each element is equal to TRUE if the corresponding null hypothesis is rejected, and to FALSE if it is not rejected
+#'                     if \code{stepdown=TRUE} and \code{logical=FALSE}, returns a list of successive p-values.
+#' @param arr.ind      if TRUE, returns the indexes of the significant correlations, with repspect to level alpha
 #'                      
 #' @importFrom stats cor
 #' @importFrom MASS mvrnorm
@@ -116,32 +129,40 @@ ApplyFwerCor <- function(data,alpha=0.05,stat_test='empirical',method='MaxTinfty
 #' n <- 100
 #' p <- 10
 #' corr_theo <- diag(1,p)
+#' corr_theo[1,3] <- 0.5
+#' corr_theo[3,1] <- 0.5
 #' data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
+#' # adjusted p-values:
+#' (res <- ApplyFwerCor_oracle(data,corr_theo,stat_test='empirical',Nboot=1000,stepdown=FALSE))
+#' # significant correlations, level alpha:
 #' alpha <- 0.05
-#' res <- ApplyFwerCor_oracle(data,corr_theo,alpha,stat_test='empirical',Nboot=1000,stepdown=FALSE)
-ApplyFwerCor_oracle <- function(data,corr_theo,alpha=0.05,stat_test='empirical',method='MaxTinfty',Nboot=1000,stepdown=TRUE,vect=FALSE){
+#' whichCor(res<alpha)
+ApplyFwerCor_oracle <- function(data,corr_theo,alpha=c(),stat_test='empirical',method='MaxTinfty',Nboot=1000,stepdown=TRUE,vect=FALSE,logical=stepdown,arr.ind=FALSE){
 
+ if(sum(stat_test==c('empirical','fisher','student','2nd.order'))==0){ stop('Wrong value for stat_test.')}
+
+ # if( (!logical) & stepdown){
+ #    warning('Stepdown procedures do not return p-values, logical is changed in TRUE.\n')
+ #    logical = TRUE
+ # }
+ if(is.null(alpha) & (logical | arr.ind)){
+    warning('For logical or indexes returns, a value of alpha is needed. alpha=0.05 is taken.\n')
+    alpha = 0.05
+ }
+ if(arr.ind){ 
+    vect <- FALSE
+    logical <- TRUE 
+ }
+  
  Gtheo <- covDcorNorm(corr_theo,stat_test)
  if(method=='MaxTinfty'){
-    if(stat_test=='gaussian'){
-        stop('MaxTinfty procedure is not implemented for Gaussian type statistics.\n')
-    }else{
-    	if(stepdown==FALSE){ res <- maxTinftyCor(data,alpha,stat_test,Nboot,Gtheo,vect=TRUE) }
-	    else{ res <- maxTinftyCor_SD(data,alpha,stat_test,Nboot,Gtheo,vect=TRUE) }
-    }
+   	if(stepdown==FALSE){ res <- maxTinftyCor(data,alpha,stat_test,Nboot,Gtheo,vect,logical) }
+    else{ res <- maxTinftyCor_SD(data,alpha,stat_test,Nboot,Gtheo,vect) }
  }
  else{ stop('The method is not implemented with oracle version.\n') }
- res <- as.logical(res)
 
- if(vect==TRUE){
-   return(res)
- }else{
-   p <- ncol(data)
-   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
-   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
-   return(cbind(rows[which(res)],columns[which(res)]))
- }
-
+ if(arr.ind){ res <- whichCor(res) }
+ 
 }
 
 #' Applies multiple testing procedures built to control (asymptotically) the FDR for correlation testing.
@@ -149,7 +170,7 @@ ApplyFwerCor_oracle <- function(data,corr_theo,alpha=0.05,stat_test='empirical',
 #' Some have no theoretical proofs for tests on a correlation matrix.
 #'
 #'
-#' @return Returns the list of significative correlations according to the multiple testing procedure applied.
+#' @return  Returns either \itemize{\item{logicals indicating if the corresponding correlation is significant, as a vector or a matrix depending on \code{vect},} \item{an array containing indexes \eqn{\lbrace(i,j),\,i<j\rbrace} for which correlation between variables \eqn{i} and \eqn{j} is significant, if \code{arr.ind=TRUE}.}}
 #
 #' @param data      matrix of observations
 #' @param alpha     level of multiple testing
@@ -158,14 +179,15 @@ ApplyFwerCor_oracle <- function(data,corr_theo,alpha=0.05,stat_test='empirical',
 #'   \item{'empirical'}{\eqn{\sqrt{n}*abs(corr)}}
 #'   \item{'fisher'}{\eqn{\sqrt{n-3}*1/2*\log( (1+corr)/(1-corr) )}}
 #'   \item{'student'}{\eqn{\sqrt{n-2}*abs(corr)/\sqrt(1-corr^2)}}
-#'   \item{'gaussian'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
+#'   \item{'2nd.order'}{\eqn{\sqrt{n}*mean(Y)/sd(Y)} with \eqn{Y=(X_i-mean(X_i))(X_j-mean(X_j))}}
 #' }
 #' @param method    choice between 'LCTnorm' and 'LCTboot' developped by Cai & Liu (2016), 
 #'                  'BH', traditional Benjamini-Hochberg's procedure Benjamini & Hochberg (1995)'s
 #'                  and 'BHboot', Benjamini-Hochberg (1995)'s procedure with bootstrap evaluation of p-values
 #' @param Nboot     number of iterations for bootstrap p-values evaluation
 #' @param vect      if TRUE returns a vector of TRUE/FALSE values, corresponding to \code{vectorize(cor(data))};
-#'                  if FALSE, returns an array containing rows and columns of significative correlations 
+#'                  if FALSE, returns an array containing rows and columns of significant correlations                  
+#' @param arr.ind   if TRUE, returns the indexes of the significant correlations, with repspect to level alpha
 #'
 #' @importFrom stats cor
 #' @importFrom MASS mvrnorm
@@ -181,34 +203,36 @@ ApplyFwerCor_oracle <- function(data,corr_theo,alpha=0.05,stat_test='empirical',
 #' n <- 100
 #' p <- 10
 #' corr_theo <- diag(1,p)
+#' corr_theo[1,3] <- 0.5
+#' corr_theo[3,1] <- 0.5
 #' data <- MASS::mvrnorm(n,rep(0,p),corr_theo)
+#' res <- ApplyFdrCor(data,stat_test='empirical',method='LCTnorm')
+#' # significant correlations, level alpha:
 #' alpha <- 0.05
-#' res <- ApplyFdrCor(data,alpha,stat_test='empirical',method='LCTnorm')
-ApplyFdrCor <- function(data,alpha=0.05,stat_test='empirical',method='LCTnorm',Nboot=1000,vect=FALSE){
+#' whichCor(res<alpha)
+ApplyFdrCor <- function(data,alpha=0.05,stat_test='empirical',method='LCTnorm',Nboot=1000,vect=FALSE,arr.ind=FALSE){
 
+  if(sum(stat_test==c('empirical','fisher','student','2nd.order'))==0){ stop('Wrong value for stat_test.')}
+  if(sum(method==c('LCTnorm','LCTboot','BH','BHboot'))==0){ stop('Wrong value for method.')}
+  if(arr.ind){ vect <- FALSE }
+  
  if(method=='LCTnorm'){
-        res <- LCTnorm(data,alpha=alpha,stat_test=stat_test,vect=TRUE)
+        res <- LCTnorm(data,alpha=alpha,stat_test=stat_test,vect)
  } 
  if(method=='LCTboot'){
-        res <- LCTboot(data,alpha=alpha,stat_test=stat_test,Nboot=Nboot,vect=TRUE)
+        res <- LCTboot(data,alpha=alpha,stat_test=stat_test,Nboot=Nboot,vect)
  } 
  if(method=='BH'){
-       res <- BHCor(data,alpha=alpha,stat_test=stat_test,vect=TRUE)
+       res <- BHCor(data,alpha=alpha,stat_test=stat_test,vect)
  }
-if(method=='BHboot'){
-       res <- BHBootCor(data,alpha=alpha,stat_test=stat_test,Nboot=Nboot,vect=TRUE)
+ if(method=='BHboot'){
+       res <- BHBootCor(data,alpha=alpha,stat_test=stat_test,Nboot=Nboot,vect)
  }
- res <- as.logical(res)
 
+ if(arr.ind){ res <- whichCor(res) }
+  
+ return(res)
 
- if(vect==TRUE){
-   return(res)
- }else{
-   p <- ncol(data)
-   rows <- vectorize(matrix(1:p,nrow=p,ncol=p))
-   columns <- vectorize(t(matrix(1:p,nrow=p,ncol=p)))
-   return(cbind(rows[which(res)],columns[which(res)]))
- }
 
 }
 
