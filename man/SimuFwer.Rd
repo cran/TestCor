@@ -4,9 +4,17 @@
 \alias{SimuFwer}
 \title{Simulates Gaussian data with a given correlation matrix and applies a FWER controlling procedure on the correlations.}
 \usage{
-SimuFwer(corr_theo, n = 100, Nsimu = 1, alpha = 0.05,
-  stat_test = "empirical", method = "Sidak", Nboot = 1000,
-  stepdown = TRUE, seed = NULL)
+SimuFwer(
+  corr_theo,
+  n = 100,
+  Nsimu = 1,
+  alpha = 0.05,
+  stat_test = "empirical",
+  method = "Sidak",
+  Nboot = 1000,
+  stepdown = TRUE,
+  seed = NULL
+)
 }
 \arguments{
 \item{corr_theo}{the correlation matrix of Gaussien data simulated}

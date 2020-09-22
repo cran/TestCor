@@ -4,9 +4,16 @@
 \alias{maxTinftyCor}
 \title{Multiple testing method of Drton & Perlman (2007) for correlations.}
 \usage{
-maxTinftyCor(data, alpha = 0.05, stat_test = "empirical",
-  Nboot = 1000, OmegaChap = covDcorNorm(cor(data), stat_test),
-  vect = FALSE, logical = FALSE, arr.ind = FALSE)
+maxTinftyCor(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  Nboot = 1000,
+  OmegaChap = covDcorNorm(cor(data), stat_test),
+  vect = FALSE,
+  logical = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

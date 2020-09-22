@@ -5,8 +5,14 @@
 \title{Sidak multiple testing method for correlations
 with stepdown procedure.}
 \usage{
-SidakCor_SD(data, alpha = 0.05, stat_test = "empirical",
-  vect = FALSE, logical = TRUE, arr.ind = FALSE)
+SidakCor_SD(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  vect = FALSE,
+  logical = TRUE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

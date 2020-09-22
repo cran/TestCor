@@ -66,7 +66,7 @@ alpha  <- 0.05               # FWER threshold
 Nboot  <- 100                # number of bootstrap or simulated samples
 
 # Simulations and application of the chosen procedure
-res <- matrix(0,nrow=length(seqn),ncol=4)
+res <- matrix(0,nrow=length(seqn),ncol=5)
 for(i in 1:length(seqn)){
     temp <- SimuFwer(corr_theo,n=seqn[i],Nsimu=Nsimu,alpha=alpha,stat_test=stat_test,
            method='BootRW',Nboot=Nboot,stepdown=SD,seed=seed)
@@ -79,8 +79,8 @@ colnames(res) <- names(temp)
 par(mfrow=c(1,2))
 plot(seqn,res[,'fwer'],type='b',ylim=c(0,max(alpha*1.1,max(res[,'fwer']))),
     main='FWER',ylab='fwer',xlab='number of observations')
-plot(seqn,res[,'power'],type='b',ylim=c(0,1.1),
-    main='Power',ylab='power',xlab='number of observations')
+plot(seqn,res[,'sensitivity'],type='b',ylim=c(0,1.1),
+    main='Power',ylab='sensitivity',xlab='number of observations')
 }
 }
 

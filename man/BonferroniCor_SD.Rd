@@ -5,8 +5,14 @@
 \title{Bonferroni multiple testing method for correlations 
 with stepdown procedure.}
 \usage{
-BonferroniCor_SD(data, alpha = 0.05, stat_test = "empirical",
-  vect = FALSE, logical = TRUE, arr.ind = FALSE)
+BonferroniCor_SD(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  vect = FALSE,
+  logical = TRUE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

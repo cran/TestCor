@@ -4,8 +4,14 @@
 \alias{SidakCor}
 \title{Sidak multiple testing procedure for correlations.}
 \usage{
-SidakCor(data, alpha = 0.05, stat_test = "empirical", vect = FALSE,
-  logical = FALSE, arr.ind = FALSE)
+SidakCor(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  vect = FALSE,
+  logical = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

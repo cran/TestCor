@@ -4,9 +4,17 @@
 \alias{SimuFwer_oracle}
 \title{Simulates Gaussian data with a given correlation matrix and applies oracle MaxTinfty on the correlations.}
 \usage{
-SimuFwer_oracle(corr_theo, n = 100, Nsimu = 1, alpha = 0.05,
-  stat_test = "empirical", method = "MaxTinfty", Nboot = 1000,
-  stepdown = TRUE, seed = NULL)
+SimuFwer_oracle(
+  corr_theo,
+  n = 100,
+  Nsimu = 1,
+  alpha = 0.05,
+  stat_test = "empirical",
+  method = "MaxTinfty",
+  Nboot = 1000,
+  stepdown = TRUE,
+  seed = NULL
+)
 }
 \arguments{
 \item{corr_theo}{the correlation matrix of Gaussien data simulated}

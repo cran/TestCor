@@ -4,8 +4,15 @@
 \alias{BootRWCor}
 \title{Bootstrap multiple testing method of Romano & Wolf (2005) for correlations.}
 \usage{
-BootRWCor(data, alpha = 0.05, stat_test = "empirical", Nboot = 1000,
-  vect = FALSE, logical = FALSE, arr.ind = FALSE)
+BootRWCor(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  Nboot = 1000,
+  vect = FALSE,
+  logical = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

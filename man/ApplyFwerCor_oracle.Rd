@@ -4,10 +4,18 @@
 \alias{ApplyFwerCor_oracle}
 \title{Applies an oracle version of MaxTinfty procedure described in Drton & Perlman (2007) for correlation testing.}
 \usage{
-ApplyFwerCor_oracle(data, corr_theo, alpha = c(),
-  stat_test = "empirical", method = "MaxTinfty", Nboot = 1000,
-  stepdown = TRUE, vect = FALSE, logical = stepdown,
-  arr.ind = FALSE)
+ApplyFwerCor_oracle(
+  data,
+  corr_theo,
+  alpha = c(),
+  stat_test = "empirical",
+  method = "MaxTinfty",
+  Nboot = 1000,
+  stepdown = TRUE,
+  vect = FALSE,
+  logical = stepdown,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

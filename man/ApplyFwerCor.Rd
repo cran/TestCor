@@ -5,9 +5,17 @@
 \title{Applies multiple testing procedures controlling (asymptotically) the FWER
 for tests on a correlation matrix.}
 \usage{
-ApplyFwerCor(data, alpha = NULL, stat_test = "empirical",
-  method = "Sidak", Nboot = 1000, stepdown = TRUE, vect = FALSE,
-  logical = stepdown, arr.ind = FALSE)
+ApplyFwerCor(
+  data,
+  alpha = NULL,
+  stat_test = "empirical",
+  method = "Sidak",
+  Nboot = 1000,
+  stepdown = TRUE,
+  vect = FALSE,
+  logical = stepdown,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

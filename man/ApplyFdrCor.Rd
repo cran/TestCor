@@ -4,8 +4,15 @@
 \alias{ApplyFdrCor}
 \title{Applies multiple testing procedures built to control (asymptotically) the FDR for correlation testing.}
 \usage{
-ApplyFdrCor(data, alpha = 0.05, stat_test = "empirical",
-  method = "LCTnorm", Nboot = 1000, vect = FALSE, arr.ind = FALSE)
+ApplyFdrCor(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  method = "LCTnorm",
+  Nboot = 1000,
+  vect = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

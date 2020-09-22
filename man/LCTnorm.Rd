@@ -4,8 +4,13 @@
 \alias{LCTnorm}
 \title{Procedure LCT-N proposed by Cai & Liu (2016) for correlation testing.}
 \usage{
-LCTnorm(data, alpha = 0.05, stat_test = "2nd.order", vect = FALSE,
-  arr.ind = FALSE)
+LCTnorm(
+  data,
+  alpha = 0.05,
+  stat_test = "2nd.order",
+  vect = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

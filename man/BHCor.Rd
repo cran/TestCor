@@ -4,8 +4,13 @@
 \alias{BHCor}
 \title{Benjamini & Hochberg (1995)'s procedure for correlation testing.}
 \usage{
-BHCor(data, alpha = 0.05, stat_test = "2nd.order", vect = FALSE,
-  arr.ind = FALSE)
+BHCor(
+  data,
+  alpha = 0.05,
+  stat_test = "2nd.order",
+  vect = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

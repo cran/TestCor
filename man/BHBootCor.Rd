@@ -4,8 +4,14 @@
 \alias{BHBootCor}
 \title{Benjamini & Hochberg (1995)'s procedure for correlation testing with bootstrap evaluation of p-values.}
 \usage{
-BHBootCor(data, alpha = 0.05, stat_test = "2nd.order", Nboot = 100,
-  vect = FALSE, arr.ind = FALSE)
+BHBootCor(
+  data,
+  alpha = 0.05,
+  stat_test = "2nd.order",
+  Nboot = 100,
+  vect = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

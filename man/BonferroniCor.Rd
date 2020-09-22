@@ -4,8 +4,14 @@
 \alias{BonferroniCor}
 \title{Bonferroni multiple testing procedure for correlations.}
 \usage{
-BonferroniCor(data, alpha = 0.05, stat_test = "empirical",
-  vect = FALSE, logical = FALSE, arr.ind = FALSE)
+BonferroniCor(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  vect = FALSE,
+  logical = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

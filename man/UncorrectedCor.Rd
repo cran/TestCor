@@ -4,8 +4,14 @@
 \alias{UncorrectedCor}
 \title{Uncorrected testing procedure for correlations.}
 \usage{
-UncorrectedCor(data, alpha = 0.05, stat_test = "empirical",
-  vect = FALSE, logical = FALSE, arr.ind = FALSE)
+UncorrectedCor(
+  data,
+  alpha = 0.05,
+  stat_test = "empirical",
+  vect = FALSE,
+  logical = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

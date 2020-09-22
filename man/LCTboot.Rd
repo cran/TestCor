@@ -4,8 +4,14 @@
 \alias{LCTboot}
 \title{Bootstrap procedure LCT-B proposed by Cai & Liu (2016) for correlation testing.}
 \usage{
-LCTboot(data, alpha = 0.05, stat_test = "2nd.order", Nboot = 100,
-  vect = FALSE, arr.ind = FALSE)
+LCTboot(
+  data,
+  alpha = 0.05,
+  stat_test = "2nd.order",
+  Nboot = 100,
+  vect = FALSE,
+  arr.ind = FALSE
+)
 }
 \arguments{
 \item{data}{matrix of observations}

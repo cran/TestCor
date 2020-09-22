@@ -4,9 +4,16 @@
 \alias{SimuFdr}
 \title{Simulates Gaussian data with a given correlation matrix and applies a FDR controlling procedure on the correlations.}
 \usage{
-SimuFdr(corr_theo, n = 100, Nsimu = 1, alpha = 0.05,
-  stat_test = "empirical", method = "LCTnorm", Nboot = 1000,
-  seed = NULL)
+SimuFdr(
+  corr_theo,
+  n = 100,
+  Nsimu = 1,
+  alpha = 0.05,
+  stat_test = "empirical",
+  method = "LCTnorm",
+  Nboot = 1000,
+  seed = NULL
+)
 }
 \arguments{
 \item{corr_theo}{the correlation matrix of Gaussien data simulated}
