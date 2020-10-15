@@ -1,7 +1,7 @@
 Package: TestCor
 Title: FWER and FDR Controlling Procedures for Multiple Correlation
         Tests
-Version: 0.0.2.1
+Version: 0.0.2.2
 Date: 2020-09-18
 Authors@R: c(
     person("Gannaz", "Irene", email = "irene.gannaz@insa-lyon.fr", role = c("aut","cre")))
@@ -16,6 +16,6 @@ LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
 Author: Gannaz Irene [aut, cre]
-Packaged: 2020-09-21 12:33:36 UTC; igannaz
+Packaged: 2020-10-15 08:17:20 UTC; igannaz
 Repository: CRAN
-Date/Publication: 2020-09-22 06:30:25 UTC
+Date/Publication: 2020-10-15 08:50:02 UTC

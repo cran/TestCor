@@ -41,7 +41,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
   NumericMatrix unvectorize(const NumericVector& vect){
 
-    int p = floor((1+sqrt(1+8*vect.length())/2));
+    int p = (int) floor((1+sqrt((double) 1+8*vect.length())/2));
     NumericMatrix mat(p,p);
     int index = 0;
     for(int irow=0; irow<p-1; ++irow){

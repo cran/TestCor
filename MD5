@@ -1,4 +1,4 @@
-72a056aae4d0a4ebc468bb6b792c0e34 *DESCRIPTION
+dcd7bf390403bd6673760d3b02840240 *DESCRIPTION
 48df12989aea2cbe6a0bc9b29127e863 *NAMESPACE
 d707cfad5c55b59e9269a53ec62d2106 *R/ApplyFwer.R
 7a57a6296d929aadc7485ed9aa488847 *R/FdrMethods.R
@@ -35,4 +35,4 @@ f398c1f0cbb29285b46291cb23488512 *man/maxTinftyCor.Rd
 a55373519e9d13df4692394f40d49a29 *man/vectorize.Rd
 a8a70c2708e9015d951bf1c0c1efdfb4 *man/whichCor.Rd
 dcfbb5f0a31f4a36b569ebc25380242c *src/RcppExports.cpp
-3604da247323293f96e195840c48413d *src/annexes.cpp
+37f73e971c72f4c5b230bf652139a875 *src/annexes.cpp
